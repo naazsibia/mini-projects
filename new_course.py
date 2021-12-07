@@ -38,15 +38,35 @@ def page_prereqs(cur_page: int):
             code = course.text.strip().split(' ')[0]
             if not code.startswith('CSC'):
                 continue
-            prereqs[code] = pre.find_next('span').contents
-            clean_contents(prereqs[code])
+            temp = pre.find_next('span').contents
+            prereqs[code] = clean_contents(temp)
     return new_page, prereqs
 
 
 def clean_contents(contents) -> None:
+    p = r'(\w{3,}\d{3,}(H|Y)5)|or|and'
+    lst = []
     for i, element in enumerate(contents):
         if type(element) is Tag:
             contents[i] = element.text
+        m = re.search(p, contents[i])
+        if m:
+            text = m.group(0)
+            contents[i] = text
+            if text in ['or', 'and']:
+                continue
+            if i + 1 < len(contents) and contents[i + 1] == 'or':
+                text = '(' + text 
+            if i - 1 > -1 and contents[i - 1] == 'or':
+                lst[-1] = '(' + lst[-1] + ' or ' + text
+                if i + 1 == len(contents) or contents[i + 1] != 'or':
+                    lst[-1] += ')'
+                continue
+            lst.append(m.group(0))
+    if lst == ['and']:
+        return []
+    return lst
+
 
 
 
