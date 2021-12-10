@@ -38,7 +38,7 @@ actual = {}
 
 for courses, lst in inverted[0].items():
     if len(courses) == 0:
-        continue
+        lst = ['CSC108H5']
     if len(courses) == 1:
         actual.setdefault(courses[0], []).extend(lst)
         continue
@@ -57,12 +57,24 @@ for key in keys:
 mappings = []
 courses = []
 
-for node, children in actual.items():
-    courses.append({'name': node})
-    for child in children:
-        mappings.append({'parent': node, 'child': child})
 
-print(mappings)
+
+def get_child(name: str, actual: dict) -> dict:
+    d = {}
+    identity = name
+    if name.startswith('and'):
+        name = 'and'
+    if name.startswith('OR'):
+        name = 'or'
+    d['name'] = name
+    d['id'] = identity
+
+    for child in actual.get(identity, []):
+        d.setdefault('children', []).append(get_child(child, actual))
+    return d    
+
+print(get_child('and_', actual))
+#print(mappings)
 
 '''
  children: [
