@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@ssthouse/vue-tree-chart": "^0.5.4"
+  }
+}
